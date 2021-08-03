@@ -1,0 +1,21 @@
+info:
+  app:
+    encoding: '@project.build.sourceEncoding@'
+    java:
+      source: '@java.version@'
+      target: '@java.version@'
+logging:
+  config: classpath:log4j2-spring-dev.xml
+app:
+  version: '@project.version@'
+  name: '@project.name@'
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  application:
+    name: '@project.name@'
+  main:
+    banner-mode: 'OFF'
+server:
+  compression:
+    enabled: true
