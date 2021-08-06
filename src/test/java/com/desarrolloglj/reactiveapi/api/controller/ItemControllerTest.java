@@ -2,6 +2,7 @@ package com.desarrolloglj.reactiveapi.api.controller;
 
 import com.desarrolloglj.reactiveapi.api.domain.Item;
 import com.desarrolloglj.reactiveapi.api.domain.dto.ItemDTO;
+import com.desarrolloglj.reactiveapi.api.domain.dto.ItemSaveDTO;
 import com.desarrolloglj.reactiveapi.api.service.ItemService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles({"test"})
@@ -74,7 +77,7 @@ public class ItemControllerTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ItemDTO.class)
-                .isEqualTo(getTestItem());
+                .isEqualTo(getTestItemDTO());
     }
 
     @Test
@@ -89,8 +92,90 @@ public class ItemControllerTest {
                 .isNotFound();
     }
 
-    private ItemDTO getTestItem()
+    @Test
+    public void whenSave_ThenReturnCreatedItem()
+    {
+        var createdItem = getTestItem();
+        when(itemService.save(any(Item.class))).thenReturn(Mono.just(createdItem));
+
+        var inputItem = getTestSaveDTO();
+        webClient.post()
+                .uri("/v1/items")
+                .body(Mono.just(inputItem), ItemSaveDTO.class)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(ItemDTO.class);
+    }
+
+    @Test
+    public void whenUpdate_AndItsSuccessful_ThenReturnUpdatedItem()
+    {
+        var updatedItem = getTestItem();
+        when(itemService.update(any(Item.class))).thenReturn(Mono.just(updatedItem));
+
+        var inputItem = getTestItemDTO();
+        webClient.put()
+                .uri("/v1/items")
+                .body(Mono.just(inputItem), ItemDTO.class)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ItemDTO.class);
+    }
+
+    @Test
+    public void whenUpdate_AndItemDoesNotExists_ThenReturnHttpStatusNotFound()
+    {
+        when(itemService.update(any(Item.class))).thenReturn(Mono.empty());
+
+        var inputItem = getTestItemDTO();
+        webClient.put()
+                .uri("/v1/items")
+                .body(Mono.just(inputItem), ItemDTO.class)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    public void whenUpdate_AndItsSuccessful_ThenReturnDeletedItem()
+    {
+        var deletedItem = getTestItem();
+        when(itemService.delete(eq(1L))).thenReturn(Mono.just(deletedItem));
+
+        webClient.delete()
+                .uri("/v1/items/1")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ItemDTO.class);
+    }
+
+    @Test
+    public void whenDelete_AndItemDoesNotExist_ThenReturnHttpStatusBadRequest()
+    {
+        when(itemService.delete(eq(1L))).thenReturn(Mono.empty());
+
+        webClient.delete()
+                .uri("/v1/items/1")
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
+    }
+
+    private ItemDTO getTestItemDTO()
     {
         return new ItemDTO(1L, "Test Item", "Test Item 1", new BigDecimal("10.5"));
+    }
+
+    private ItemSaveDTO getTestSaveDTO()
+    {
+        return new ItemSaveDTO("Test Item", "Test Item 1", new BigDecimal("10.5"));
+    }
+
+    private Item getTestItem()
+    {
+        return new Item(1L, "Test Item", "Test Item 1", new BigDecimal("10.5"));
     }
 }

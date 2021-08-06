@@ -8,10 +8,20 @@ An Api using Java 11, Spring and the following packages:
 - Lombok
 - Mapstruct
 - Springfox (Swagger)
+- Junit 5 tests and Jacoco plugin for coverage
 
 ### Api documentation
 
-After run the project, visit:
+To run, you can use Maven:
+
+`mvn spring-boot:run -Dspring-boot.run.profiles=dev`
+
+After run, visit:
 
 [http://localhost:8080/swagger-ui/](http://localhost:8080/swagger-ui/)
 
+To run the test, use:
+
+`mvn test`
+
+You will find the coverage report visiting `/target/site/jacoco` directory.
