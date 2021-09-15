@@ -48,7 +48,6 @@ public class ItemServiceImpl implements ItemService {
     return itemRepository
         .findById(id)
         .flatMap(currentItem -> itemRepository.deleteById(id).then(Mono.just(currentItem)))
-        .flux()
-        .singleOrEmpty();
+        .switchIfEmpty(Mono.empty());
   }
 }

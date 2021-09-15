@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.desarrolloglj</groupId>
 	<artifactId>reactiveapi</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>reactiveapi</name>
 	<description>Spring boot reactive Api example</description>
 	<properties>
